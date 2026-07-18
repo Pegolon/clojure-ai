@@ -1,0 +1,38 @@
+name: OpenSpec Archived
+
+# Gate PRs on OpenSpec hygiene: all changes must be archived before merge.
+# An "active" change is any directory under openspec/changes/ other than archive/.
+# When work is complete, its change is folded into openspec/specs/ and moved into
+# openspec/changes/archive/, leaving openspec/changes/ with only the archive/ dir.
+
+on:
+  pull_request:
+
+jobs:
+  archived:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Require all OpenSpec changes to be archived
+        run: |
+          changes_dir="openspec/changes"
+
+          if [ ! -d "$changes_dir" ]; then
+            echo "No $changes_dir directory found; nothing to check."
+            exit 0
+          fi
+
+          # List active change directories (everything under changes/ except archive/).
+          active="$(find "$changes_dir" -mindepth 1 -maxdepth 1 -type d ! -name archive -printf '%f\n' | sort)"
+
+          if [ -n "$active" ]; then
+            echo "::error::Un-archived OpenSpec changes found. Archive them (/opsx:archive) before merging."
+            echo "Active changes still present under $changes_dir/:"
+            echo "$active" | sed 's/^/  - /'
+            exit 1
+          fi
+
+          echo "All OpenSpec changes are archived. ✅"
