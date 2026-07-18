@@ -1,5 +1,7 @@
 # podcast-rss
 
+[![Test](https://github.com/Pegolon/clojure-ai/actions/workflows/test.yml/badge.svg)](https://github.com/Pegolon/clojure-ai/actions/workflows/test.yml)
+
 A small [Clojure](https://clojure.org) project that generates a
 [podcast RSS 2.0 feed](https://help.apple.com/itc/podcasts_connect/#/itcb54353390)
 — including the Apple Podcasts (`itunes:`) and Atom extensions — from plain
