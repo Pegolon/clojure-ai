@@ -115,6 +115,40 @@ lein uberjar
                                   :audio-url "https://example.com/ep1.mp3"}]}))
 ```
 
+## Development workflow
+
+This project uses [OpenSpec](https://github.com/Fission-AI/OpenSpec) for
+spec-driven development: non-trivial changes are described as a proposal and
+validated against specs *before* code is written, so the intent behind each
+change lives in versioned Markdown under `openspec/` instead of chat history.
+
+Install the CLI (Node.js 20.19+):
+
+```bash
+npm install -g @fission-ai/openspec@latest
+```
+
+From an AI assistant (Claude Code, etc.), the workflow runs through `/opsx:*`
+slash commands — the usual loop is **propose → apply → archive**:
+
+| Command | What it does |
+| --- | --- |
+| `/opsx:explore` | Think through an idea or investigate a problem |
+| `/opsx:propose "<idea>"` | Create a change with all artifacts (proposal, design, specs, tasks) |
+| `/opsx:apply` | Implement the change's tasks against its specs |
+| `/opsx:update` | Revise a change's planning artifacts (no code changes) |
+| `/opsx:sync` | Fold a change's delta specs into the main specs |
+| `/opsx:archive` | Finalize a completed change and update the main specs |
+
+Or drive it straight from the CLI:
+
+```bash
+openspec list            # in-flight changes
+openspec list --specs    # current specs
+openspec view            # interactive dashboard
+openspec validate        # validate changes and specs
+```
+
 ## Output
 
 `feed/generate` returns a complete RSS document string. See

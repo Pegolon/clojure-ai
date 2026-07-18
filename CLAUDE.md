@@ -45,6 +45,38 @@ Key conventions:
 - The XML emitter is intentionally hand-rolled (no `data.xml`) to keep exact
   control over iTunes/Atom namespace prefixes and output formatting.
 
+## Spec-driven workflow (OpenSpec)
+
+This repo uses [OpenSpec](https://github.com/Fission-AI/OpenSpec) for
+spec-driven development. Non-trivial features and behavior changes should go
+through a change proposal before code is written, so intent lives in versioned
+Markdown under `openspec/` rather than in chat history.
+
+Use the `/opsx:*` slash commands (backed by the skills in
+`.claude/skills/openspec-*`):
+
+- `/opsx:explore` — think through an idea or investigate a problem before
+  committing to a change.
+- `/opsx:propose "<what to build>"` — create a change and generate all its
+  artifacts (proposal, design, delta specs, tasks) in one step.
+- `/opsx:apply` — implement the tasks from a change against its specs.
+- `/opsx:update` — revise a change's planning artifacts and keep them coherent
+  (does not touch code).
+- `/opsx:sync` — fold a change's delta specs into the main specs.
+- `/opsx:archive` — finalize a completed change and roll it into the main specs.
+
+The typical loop is **propose → apply → archive**. Inspect state with the CLI:
+
+```bash
+openspec list            # in-flight changes
+openspec list --specs    # current specs
+openspec view            # interactive dashboard
+openspec validate        # validate changes and specs
+```
+
+The `openspec/` directory (config, specs, and changes) is the source of truth
+for intended behavior; keep it in sync when you change what the library does.
+
 ## Environment note (Claude Code on the web / sandbox)
 
 Dependency resolution requires Clojars over the sandbox's mandatory HTTPS
