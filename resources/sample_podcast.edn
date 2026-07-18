@@ -1,0 +1,31 @@
+{:title "The Clojure Cast"
+ :link "https://example.com/clojure-cast"
+ :description "A weekly podcast about Clojure, functional programming, and the JVM."
+ :language "en-us"
+ :author "Jane Doe"
+ :email "jane@example.com"
+ :image "https://example.com/clojure-cast/artwork.jpg"
+ :category "Technology"
+ :explicit? false
+ :self-url "https://example.com/clojure-cast/feed.xml"
+ :episodes
+ [{:title "Episode 1: Why Clojure?"
+   :description "We kick things off by talking about why we love Clojure."
+   :audio-url "https://example.com/clojure-cast/ep1.mp3"
+   :audio-length 24567890
+   :audio-type "audio/mpeg"
+   :guid "clojure-cast-ep-1"
+   :pub-date "Tue, 03 Jun 2025 09:00:00 +0000"
+   :duration "00:42:15"
+   :episode-number 1
+   :explicit? false}
+  {:title "Episode 2: Data All the Way Down"
+   :description "Maps, vectors, sets, and the joy of programming with plain data."
+   :audio-url "https://example.com/clojure-cast/ep2.mp3"
+   :audio-length 31234567
+   :audio-type "audio/mpeg"
+   :guid "clojure-cast-ep-2"
+   :pub-date "Tue, 10 Jun 2025 09:00:00 +0000"
+   :duration "00:51:03"
+   :episode-number 2
+   :explicit? false}]}
