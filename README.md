@@ -12,11 +12,42 @@ output is deterministic and easy to reason about.
 ## Project layout
 
 ```
+src/podcast_rss/schema.clj ; data-driven, type-safe validation (malli-style)
 src/podcast_rss/xml.clj    ; dependency-free Hiccup-style XML emitter
-src/podcast_rss/feed.clj   ; builds an RSS feed from a podcast map
+src/podcast_rss/feed.clj   ; builds an RSS feed from a validated podcast map
 src/podcast_rss/core.clj   ; CLI: EDN in -> RSS out
 test/podcast_rss/          ; tests (incl. real XML-parser validation)
 resources/sample_podcast.edn
+```
+
+## Type safety
+
+Every podcast passed to `feed/generate` is validated against a schema before
+any XML is produced. Invalid input throws an `ex-info` that lists every
+problem with its exact path, e.g.:
+
+```
+Invalid podcast:
+  :title: should be a non-empty string, got ""
+  :episodes -> 0 -> :description: missing required key
+```
+
+The schemas live in `podcast_rss/schema.clj`. Their syntax deliberately
+mirrors [malli](https://github.com/metosin/malli) — maps are
+`[:map [key schema] ...]`, entries can be `{:optional true}`, sequences are
+`[:sequential schema]` — so the project stays dependency-free today while
+making a later switch to malli close to a drop-in replacement. (Malli is
+published only on Clojars, which was unreachable in the environment where this
+was built; `schema.clj` documents exactly what to change to adopt it.)
+
+Use the validators directly if you like:
+
+```clojure
+(require '[podcast-rss.schema :as schema])
+
+(schema/valid?    schema/Podcast my-podcast)  ; => true/false
+(schema/explain   schema/Podcast my-podcast)  ; => nil, or a seq of errors
+(schema/validate! schema/Podcast my-podcast "podcast")  ; => value, or throws
 ```
 
 ## The data model

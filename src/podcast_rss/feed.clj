@@ -28,7 +28,8 @@
        :duration \"00:42:15\"        ; optional
        :episode-number 1             ; optional
        :explicit? false}"
-  (:require [podcast-rss.xml :as xml]))
+  (:require [podcast-rss.xml :as xml]
+            [podcast-rss.schema :as schema]))
 
 (def ^:private rss-attrs
   {:version "2.0"
@@ -93,6 +94,9 @@
      (map item episodes)))])
 
 (defn generate
-  "Render a podcast map to a complete RSS XML document string."
+  "Validate a podcast map against `schema/Podcast` and render it to a
+  complete RSS XML document string. Throws an ex-info describing every
+  problem when the input does not conform."
   [podcast]
+  (schema/validate! schema/Podcast podcast "podcast")
   (xml/emit (podcast->rss podcast)))
