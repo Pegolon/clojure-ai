@@ -5,14 +5,16 @@ A small [Clojure](https://clojure.org) project that generates a
 — including the Apple Podcasts (`itunes:`) and Atom extensions — from plain
 Clojure/EDN data.
 
-Built with **Clojure 1.12.5** (the latest release) and no runtime dependencies
-beyond Clojure itself: the XML is emitted by a tiny built-in module, so the
-output is deterministic and easy to reason about.
+Built with **Clojure 1.12.5** (the latest release), managed with
+[Leiningen](https://leiningen.org), and made type-safe with
+[malli](https://github.com/metosin/malli). The XML is emitted by a tiny
+built-in module, so the output is deterministic and easy to reason about.
 
 ## Project layout
 
 ```
-src/podcast_rss/schema.clj ; data-driven, type-safe validation (malli-style)
+project.clj                ; Leiningen project + dependencies
+src/podcast_rss/schema.clj ; malli schemas + type-safe validation
 src/podcast_rss/xml.clj    ; dependency-free Hiccup-style XML emitter
 src/podcast_rss/feed.clj   ; builds an RSS feed from a validated podcast map
 src/podcast_rss/core.clj   ; CLI: EDN in -> RSS out
@@ -22,23 +24,17 @@ resources/sample_podcast.edn
 
 ## Type safety
 
-Every podcast passed to `feed/generate` is validated against a schema before
-any XML is produced. Invalid input throws an `ex-info` that lists every
-problem with its exact path, e.g.:
+The `Podcast` and `Episode` shapes are defined as
+[malli](https://github.com/metosin/malli) schemas in `podcast_rss/schema.clj`.
+Every podcast passed to `feed/generate` is validated before any XML is
+produced; invalid input throws an `ex-info` whose message lists every problem
+with its exact path. For example, a podcast with an empty title and an episode
+missing its description throws:
 
 ```
-Invalid podcast:
-  :title: should be a non-empty string, got ""
-  :episodes -> 0 -> :description: missing required key
+Invalid podcast: {:title ["should be at least 1 character"],
+                  :episodes [{:description ["missing required key"]}]}
 ```
-
-The schemas live in `podcast_rss/schema.clj`. Their syntax deliberately
-mirrors [malli](https://github.com/metosin/malli) — maps are
-`[:map [key schema] ...]`, entries can be `{:optional true}`, sequences are
-`[:sequential schema]` — so the project stays dependency-free today while
-making a later switch to malli close to a drop-in replacement. (Malli is
-published only on Clojars, which was unreachable in the environment where this
-was built; `schema.clj` documents exactly what to change to adopt it.)
 
 Use the validators directly if you like:
 
@@ -46,7 +42,8 @@ Use the validators directly if you like:
 (require '[podcast-rss.schema :as schema])
 
 (schema/valid?    schema/Podcast my-podcast)  ; => true/false
-(schema/explain   schema/Podcast my-podcast)  ; => nil, or a seq of errors
+(schema/humanize  schema/Podcast my-podcast)  ; => nil, or a nested error map
+(schema/explain   schema/Podcast my-podcast)  ; => nil, or a malli explanation
 (schema/validate! schema/Podcast my-podcast "podcast")  ; => value, or throws
 ```
 
@@ -82,30 +79,24 @@ Optional keys are simply omitted from the output when absent.
 
 ## Usage
 
-### With Maven (works out of the box)
+Requires [Leiningen](https://leiningen.org) (which pulls in Clojure and malli
+on first run).
 
 ```bash
 # Run the tests
-mvn test
+lein test
 
 # Generate a feed from EDN (writes feed.xml)
-mvn -q compile exec:java -Dexec.args="resources/sample_podcast.edn feed.xml"
+lein run resources/sample_podcast.edn feed.xml
 
 # ...or print to stdout
-mvn -q compile exec:java -Dexec.args="resources/sample_podcast.edn"
-```
+lein run resources/sample_podcast.edn
 
-### With the Clojure CLI (`clj`)
+# Start a REPL
+lein repl
 
-If you have the [Clojure CLI](https://clojure.org/guides/install_clojure)
-installed, a `deps.edn` is provided too:
-
-```bash
-# Generate a feed
-clj -M:run resources/sample_podcast.edn feed.xml
-
-# Run the tests
-clj -X:test
+# Build a standalone uberjar
+lein uberjar
 ```
 
 ### From the REPL / your own code
